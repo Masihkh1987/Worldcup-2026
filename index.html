@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>جام جهانی 2026</title>
+<style>
+body { background: #1a1a2e; color: white; font-family: sans-serif; padding: 20px; }
+.match { background: #0f3460; padding: 12px; margin: 8px auto; border-radius: 8px; max-width: 500px; display: flex; justify-content: space-between; align-items: center; }
+.team { padding: 8px 20px; cursor: pointer; border-radius: 5px; background: #16213e; font-size: 14px; }
+.team:hover { background: #e94560; }
+.winner { background: #2ecc71; color: black; }
+.loser { opacity: 0.4; }
+.vs { color: #e94560; font-weight: bold; }
+.round-title { color: #e94560; margin-top: 25px; font-size: 18px; text-align: center; border-bottom: 2px solid #e94560; padding-bottom: 5px; }
+.placeholder { color: #888; font-style: italic; }
+.match-num { background: #e94560; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1 style="text-align:center">جام جهانی 2026</h1>
+<div id="bracket"></div>
+
+<script>
+// ============================================
+// ۱۲ گروه - ۴ تیم در هر گروه
+// ============================================
+// اینجا نام تیم‌ها رو بنویس
+
+var teams = {
+  A1: "برزیل", A2: "آرژانتین", A3: "پرو", A4: "شیلی",
+  B1: "آلمان", B2: "فرانسه", B3: "هلند", B4: "بلژیک",
+  C1: "اسپانیا", C2: "پرتغال", C3: "ایتالیا", C4: "انگلیس",
+  D1: "آرژانتین", D2: "اروگوئه", D3: "پاراگوئه", D4: "اکوادور",
+  E1: "ژاپن", E2: "کره جنوبی", E3: "استرالیا", E4: "ایران",
+  F1: "مراکش", F2: "تونس", F3: "مصر", F4: "نیجریه",
+  G1: "آمریکا", G2: "مکزیک", G3: "کانادا", G4: "کاستاریکا",
+  H1: "کلمبیا", H2: "شیلی", H3: "اکوادور", H4: "ونزوئلا",
+  I1: "لهستان", I2: "سوئد", I3: "دانمارک", I4: "صربستان",
+  J1: "سنگال", J2: "غنا", J3: "کامرون", J4: "ساحل عاج",
+  K1: "اروگوئه", K2: "پاراگوئه", K3: "بولیوی", K4: "ونزوئلا",
+  L1: "پرتغال", L2: "ترکیه", L3: "سوئیس", L4: "اتریش"
+};
+
+// تیم‌های سوم (بعد از قرعه‌کشی مشخص می‌شن)
+var thirdPlaceTeams = {
+  BCDEF: "؟", ACDEF: "؟", BFGH: "؟", AHIJ: "؟", CDKL: "؟"
+};
+
+function getTeam(code) {
+  if (code.startsWith("3rd_")) return "تیم سوم " + code.replace("3rd_", "");
+  if (teams[code]) return teams[code];
+  if (code.startsWith("W")) return "برنده " + code.replace("W", "");
+  if (code.startsWith("L")) return "بازنده " + code.replace("L", "");
+  return code;
+}
+
+// ============================================
+// دور 1/16: 16 بازی (73-88)
+// ============================================
+var r32 = [
+  { id: 1, num: 73, code1: "A1", code2: "3rd_BCDEF", win: null },
+  { id: 2, num: 74, code1: "B1", code2: "3rd_ACDEF", win: null },
+  { id: 3, num: 75, code1: "C1", code2: "D2", win: null },
+  { id: 4, num: 76, code1: "D1", code2: "C2", win: null },
+  { id: 5, num: 77, code1: "E1", code2: "3rd_BFGH", win: null },
+  { id: 6, num: 78, code1: "F1", code2: "E2", win: null },
+  { id: 7, num: 79, code1: "G1", code2: "3rd_AHIJ", win: null },
+  { id: 8, num: 80, code1: "H1", code2: "G2", win: null },
+  { id: 9, num: 81, code1: "I1", code2: "3rd_CDKL", win: null },
+  { id: 10, num: 82, code1: "J1", code2: "H2", win: null },
+  { id: 11, num: 83, code1: "K1", code2: "L2", win: null },
+  { id: 12, num: 84, code1: "L1", code2: "K2", win: null },
+  { id: 13, num: 85, code1: "A2", code2: "B2", win: null },
+  { id: 14, num: 86, code1: "E2", code2: "F2", win: null },
+  { id: 15, num: 87, code1: "I2", code2: "J2", win: null },
+  { id: 16, num: 88, code1: "G2", code2: "D2", win: null }
+];
+
+// ============================================
+// دورهای بعد
+// ============================================
+var r16 = [
+  { id: 17, num: 89, code1: "W73", code2: "W74", win: null },
+  { id: 18, num: 90, code1: "W75", code2: "W76", win: null },
+  { id: 19, num: 91, code1: "W77", code2: "W78", win: null },
+  { id: 20, num: 92, code1: "W79", code2: "W80", win: null },
+  { id: 21, num: 93, code1: "W81", code2: "W82", win: null },
+  { id: 22, num: 94, code1: "W83", code2: "W84", win: null },
+  { id: 23, num: 95, code1: "W85", code2: "W86", win: null },
+  { id: 24, num: 96, code1: "W87", code2: "W88", win: null }
+];
+
+var qf = [
+  { id: 25, num: 97, code1: "W89", code2: "W90", win: null },
+  { id: 26, num: 98, code1: "W91", code2: "W92", win: null },
+  { id: 27, num: 99, code1: "W93", code2: "W94", win: null },
+  { id: 28, num: 100, code1: "W95", code2: "W96", win: null }
+];
+
+var sf = [
+  { id: 29, num: 101, code1: "W97", code2: "W98", win: null },
+  { id: 30, num: 102, code1: "W99", code2: "W100", win: null }
+];
+
+var tp = { id: 31, num: 103, code1: "L101", code2: "L102", win: null };
+var fi = { id: 32, num: 104, code1: "W101", code2: "W102", win: null };
+
+// ============================================
+// اتصال بازی‌ها
+// ============================================
+var map = {
+  1: { next: 17, side: 1 }, 2: { next: 17, side: 2 },
+  3: { next: 18, side: 1 }, 4: { next: 18, side: 2 },
+  5: { next: 19, side: 1 }, 6: { next: 19, side: 2 },
+  7: { next: 20, side: 1 }, 8: { next: 20, side: 2 },
+  9: { next: 21, side: 1 }, 10: { next: 21, side: 2 },
+  11: { next: 22, side: 1 }, 12: { next: 22, side: 2 },
+  13: { next: 23, side: 1 }, 14: { next: 23, side: 2 },
+  15: { next: 24, side: 1 }, 16: { next: 24, side: 2 },
+  17: { next: 25, side: 1 }, 18: { next: 25, side: 2 },
+  19: { next: 26, side: 1 }, 20: { next: 26, side: 2 },
+  21: { next: 27, side: 1 }, 22: { next: 27, side: 2 },
+  23: { next: 28, side: 1 }, 24: { next: 28, side: 2 },
+  25: { next: 29, side: 1 }, 26: { next: 29, side: 2 },
+  27: { next: 30, side: 1 }, 28: { next: 30, side: 2 },
+  29: { next: 32, side: 1, loserNext: 31, loserSide: 1 },
+  30: { next: 32, side: 2, loserNext: 31, loserSide: 2 }
+};
+
+function findMatch(id) {
+  for (var i = 0; i < r32.length; i++) if (r32[i].id == id) return r32[i];
+  for (var i = 0; i < r16.length; i++) if (r16[i].id == id) return r16[i];
+  for (var i = 0; i < qf.length; i++) if (qf[i].id == id) return qf[i];
+  for (var i = 0; i < sf.length; i++) if (sf[i].id == id) return sf[i];
+  if (tp.id == id) return tp;
+  if (fi.id == id) return fi;
+  return null;
+}
+
+function pick(matchId, teamNum) {
+  var m = findMatch(matchId);
+  if (!m) return;
+  
+  var teamCode = teamNum == 1 ? m.code1 : m.code2;
+  var teamName = getTeam(teamCode);
+  m.win = teamName;
+  
+  var n = map[matchId];
+  if (n) {
+    var next = findMatch(n.next);
+    if (next) {
+      if (n.side == 1) next.code1 = "W" + m.num;
+      else next.code2 = "W" + m.num;
+    }
+    
+    if (n.loserNext) {
+      var loserCode = m.code1 == teamCode ? m.code2 : m.code1;
+      var loserMatch = findMatch(n.loserNext);
+      if (loserMatch) {
+        if (n.loserSide == 1) loserMatch.code1 = "L" + m.num;
+        else loserMatch.code2 = "L" + m.num;
+      }
+    }
+  }
+  
+  render();
+}
+
+function render() {
+  var h = '';
+  
+  h += '<div class="round-title">دور 1/16 نهایی (73-88)</div>';
+  for (var i = 0; i < r32.length; i++) h += makeMatch(r32[i]);
+  
+  h += '<div class="round-title">دور 1/8 نهایی (89-96)</div>';
+  for (var i = 0; i < r16.length; i++) h += makeMatch(r16[i]);
+  
+  h += '<div class="round-title">۱/۴ نهایی (97-100)</div>';
+  for (var i = 0; i < qf.length; i++) h += makeMatch(qf[i]);
+  
+  h += '<div class="round-title">نیمه‌نهایی (101-102)</div>';
+  for (var i = 0; i < sf.length; i++) h += makeMatch(sf[i]);
+  
+  h += '<div class="round-title">رده‌بندی (103)</div>';
+  h += makeMatch(tp);
+  
+  h += '<div class="round-title">فینال (104)</div>';
+  h += makeMatch(fi);
+  
+  document.getElementById("bracket").innerHTML = h;
+}
+
+function makeMatch(m) {
+  var t1 = getTeam(m.code1);
+  var t2 = getTeam(m.code2);
+  
+  var c1 = m.win == t1 ? "winner" : m.win && m.win != t1 ? "loser" : "";
+  var c2 = m.win == t2 ? "winner" : m.win && m.win != t2 ? "loser" : "";
+  
+  var p1 = m.code1.startsWith("W") || m.code1.startsWith("L") || m.code1.startsWith("3rd") ? "placeholder" : "";
+  var p2 = m.code2.startsWith("W") || m.code2.startsWith("L") || m.code2.startsWith("3rd") ? "placeholder" : "";
+  
+  return '<div class="match">' +
+    '<span class="team ' + c1 + ' ' + p1 + '" onclick="pick(' + m.id + ',1)">' + t1 + '</span>' +
+    '<span class="match-num">بازی ' + m.num + '</span>' +
+    '<span class="vs">VS</span>' +
+    '<span class="team ' + c2 + ' ' + p2 + '" onclick="pick(' + m.id + ',2)">' + t2 + '</span>' +
+    '</div>';
+}
+
+render();
+</script>
+</body>
+</html>
